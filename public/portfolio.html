@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arham Bin Owais - Portfolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+  <nav class="navbar" id="navbar">
+    <a class="nav-logo" href="#hero">ABO</a>
+    <ul class="nav-links" id="nav-links"></ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="floating-nav" id="floating-nav"></div>
+  <div id="sections-wrapper">
+    <section id="hero" class="section"><div class="hero-content">
+      <p class="hero-greeting" id="hero-greeting"></p>
+      <h1 class="hero-name" id="hero-name"></h1>
+      <div class="hero-typing"><span id="typing-text"></span><span class="cursor"></span></div>
+      <p class="hero-subtitle" id="hero-subtitle"></p>
+      <div class="hero-buttons" id="hero-buttons"></div>
+    </div></section>
+    <section id="about" class="section"><div class="reveal"><div class="section-line"></div><h2 class="section-heading" id="about-heading"></h2></div>
+      <div class="about-grid reveal"><div class="about-text" id="about-text"></div><div class="stats-grid" id="stats-grid"></div></div></section>
+    <section id="skills" class="section"><div class="reveal"><div class="section-line"></div><h2 class="section-heading" id="skills-heading"></h2></div><div class="skills-grid reveal" id="skills-grid"></div></section>
+    <section id="education" class="section"><div class="reveal"><div class="section-line"></div><h2 class="section-heading" id="education-heading"></h2></div><div class="timeline reveal" id="timeline"></div></section>
+    <section id="certifications" class="section"><div class="reveal"><div class="section-line"></div><h2 class="section-heading" id="certs-heading"></h2></div><div class="certs-grid reveal" id="certs-grid"></div></section>
+    <section id="projects" class="section"><div class="reveal"><div class="section-line"></div><h2 class="section-heading" id="projects-heading"></h2></div><div class="projects-grid reveal" id="projects-grid"></div></section>
+    <section id="contact" class="section"><div class="reveal"><div class="section-line"></div><h2 class="section-heading" id="contact-heading"></h2></div>
+      <div class="contact-container reveal"><p class="contact-desc" id="contact-desc"></p><div class="contact-buttons" id="contact-buttons"></div></div></section>
+  </div>
+  <footer class="footer" id="footer"></footer>
+  <div class="visitor-banner" id="visitor-banner" style="display:none;">Welcome, <span id="visitor-name-display"></span>! <button class="logout-btn" onclick="logout()">Exit</button></div>
+  <script src="main.js"></script>
+</body>
+</html>

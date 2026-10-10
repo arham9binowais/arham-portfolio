@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Editor</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="editor.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left"><i class="fas fa-pen-to-square"></i> <span>Portfolio Editor</span></div>
+  <div class="topbar-center" id="save-status"><i class="fas fa-circle" style="color:#00ff88;font-size:8px"></i> All changes saved</div>
+  <div class="topbar-right">
+    <button onclick="window.open('/portfolio.html','_blank')" class="tb-btn"><i class="fas fa-eye"></i> Preview</button>
+    <button onclick="openJsonEditor()" class="tb-btn"><i class="fas fa-code"></i> JSON</button>
+    <button onclick="doLogout()" class="tb-btn tb-btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</div>
+<div class="editor-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label"><i class="fas fa-arrows-up-down" style="margin-right:.3rem;font-size:.65rem"></i> SECTIONS <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.6;font-size:.65rem">(drag to reorder)</span></div>
+      <div id="sidebar-sections-list"></div>
+      <button class="sidebar-btn sidebar-btn-add" onclick="addNewCustomSection()"><i class="fas fa-plus"></i> Add Custom Section</button>
+    </div>
+    <div class="sidebar-section sidebar-bottom-sections">
+      <button class="sidebar-btn sidebar-btn-draggable" data-section="nav" data-sid="nav" draggable="true">
+        <span class="drag-handle sidebar-grip" title="Drag to reorder"><i class="fas fa-grip-vertical"></i></span>
+        <i class="fas fa-bars"></i> <span>Navigation</span>
+      </button>
+      <button class="sidebar-btn sidebar-btn-draggable" data-section="footer" data-sid="footer" draggable="true">
+        <span class="drag-handle sidebar-grip" title="Drag to reorder"><i class="fas fa-grip-vertical"></i></span>
+        <i class="fas fa-paragraph"></i> <span>Footer</span>
+      </button>
+    </div>
+  </aside>
+  <main class="editor-main" id="editor-main"></main>
+</div>
+<div class="modal-overlay" id="json-modal" style="display:none"><div class="h100 modal-box"><div class="modal-header"><h3>Raw JSON Editor</h3><button onclick="closeJsonEditor()" class="modal-close">&times;</button></div><textarea id="json-textarea" spellcheck="false"></textarea><div class="modal-actions"><button onclick="closeJsonEditor()" class="modal-btn modal-btn-cancel">Cancel</button><button onclick="saveJsonEditor()" class="modal-btn modal-btn-save">Save JSON</button></div></div></div>
+<script src="editor.js"></script>
+</body>
+</html>

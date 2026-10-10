@@ -1,0 +1,20 @@
+{
+  "name": "arham-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio CMS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "dependencies": {
+    "@vercel/functions": "^2.2.0",
+    "express": "^4.21.2",
+    "mongodb": "^6.18.0",
+    "nodemailer": "^9.0.5"
+  }
+}

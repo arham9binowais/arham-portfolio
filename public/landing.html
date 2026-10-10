@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arham Bin Owais - Portfolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0e17; color: #e0e0e0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+    .container { position: relative; z-index: 1; text-align: center; padding: 2rem; }
+    .logo { font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #00d4ff, #7b2ff7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+    .subtitle { color: #8892b0; margin-bottom: 2.5rem; font-size: 1.05rem; }
+    .cards { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+    .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 2.5rem 2rem; width: 280px; cursor: pointer; transition: all 0.3s ease; text-align: center; }
+    .card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-6px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+    .card-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .card-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+    .card-desc { font-size: 0.88rem; color: #8892b0; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #111827; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 2rem; width: 400px; max-width: 90vw; }
+    .modal h3 { color: #fff; margin-bottom: 1.5rem; font-size: 1.2rem; }
+    .modal input { width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #e0e0e0; font-size: 0.95rem; margin-bottom: 1rem; outline: none; font-family: inherit; }
+    .modal input:focus { border-color: #00d4ff; }
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+    .modal-actions button { flex: 1; padding: 0.75rem; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.2s; }
+    .btn-go { background: linear-gradient(135deg, #00d4ff, #7b2ff7); color: #fff; }
+    .btn-go:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,212,255,0.3); }
+    .btn-cancel { background: rgba(255,255,255,0.05); color: #8892b0; }
+    .btn-cancel:hover { background: rgba(255,255,255,0.08); }
+    .error { color: #f87171; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <div class="container">
+    <div class="logo">ABO</div>
+    <p class="subtitle">Arham Bin Owais — Portfolio</p>
+    <div class="cards">
+      <div class="card" onclick="openModal('visitor')">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">See Portfolio</div>
+        <div class="card-desc">View Arham's portfolio</div>
+      </div>
+      <div class="card" onclick="openModal('admin')">
+        <div class="card-icon">✏️</div>
+        <div class="card-title">Edit Portfolio</div>
+        <div class="card-desc">Admin access to edit</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="visitor-modal">
+    <div class="modal">
+      <h3>Enter Your Name</h3>
+      <input type="text" id="v-name" placeholder="Your name" onkeydown="if(event.key==='Enter')goVisitor()">
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+        <button class="btn-go" onclick="goVisitor()">View Portfolio →</button>
+      </div>
+      <div class="error" id="v-err">Please enter your name</div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="admin-modal">
+    <div class="modal">
+      <h3>Admin Login</h3>
+      <input type="text" id="a-name" placeholder="Your name">
+      <input type="email" id="a-email" placeholder="Email">
+      <input type="password" id="a-pass" placeholder="Password" onkeydown="if(event.key==='Enter')goAdmin()">
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+        <button class="btn-go" onclick="goAdmin()">Login →</button>
+      </div>
+      <div class="error" id="a-err">Invalid credentials</div>
+    </div>
+  </div>
+
+  <script>
+    // Rich particle background — same system as the portfolio page (particles
+    // with trails, drifting outline shapes, twinkling stars, shooting stars,
+    // click ripples, mouse-link gradient), tuned with more particles and
+    // faster movement for the landing page.
+    (function() {
+      const cv = document.getElementById('particles'), cx = cv.getContext('2d');
+      let ps = [], shapes = [], stars = [], ripples = [], mouse = {x:null,y:null}, hb = 220;
+      function rz() { cv.width = innerWidth; cv.height = innerHeight; } rz(); addEventListener('resize', rz);
+      addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+      addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+      addEventListener('click', e => { for(let i=0;i<3;i++) ripples.push({x:e.clientX,y:e.clientY,r:0,mr:80+i*40,a:0.4,s:2+i*.5}); });
+
+      class P {
+        constructor(){this.reset(true)}
+        reset(i){this.x=i?Math.random()*cv.width:(Math.random()<.5?-10:cv.width+10);this.y=Math.random()*cv.height;this.sz=Math.random()*2.5+.5;this.sx=(Math.random()-.5)*1.5;this.sy=(Math.random()-.5)*1.5;this.h=hb+Math.random()*60;this.a=Math.random()*.5+.15;this.p=Math.random()*6.28;this.trail=[];}
+        update(){if(mouse.x!==null){const dx=mouse.x-this.x,dy=mouse.y-this.y,d=Math.sqrt(dx*dx+dy*dy);if(d<180){const f=(180-d)/180;this.sx+=dx*f*.005;this.sy+=dy*f*.005;}}this.trail.push({x:this.x,y:this.y});if(this.trail.length>5)this.trail.shift();this.x+=this.sx;this.y+=this.sy;this.sx*=.994;this.sy*=.994;this.p+=.03;this.h=(hb+Math.sin(this.p)*30)%360;if(this.x<-20||this.x>cv.width+20||this.y<-20||this.y>cv.height+20)this.reset(false);}
+        draw(){const s=this.sz*(1+Math.sin(this.p)*.3);for(let i=0;i<this.trail.length;i++){const t=this.trail[i];cx.beginPath();cx.arc(t.x,t.y,s*.5,0,6.28);cx.fillStyle=`hsla(${this.h},80%,60%,${(i/this.trail.length)*this.a*.3})`;cx.fill();}cx.beginPath();cx.arc(this.x,this.y,s*3.5,0,6.28);cx.fillStyle=`hsla(${this.h},80%,60%,${this.a*.08})`;cx.fill();cx.beginPath();cx.arc(this.x,this.y,s,0,6.28);cx.fillStyle=`hsla(${this.h},85%,65%,${this.a})`;cx.fill();}
+      }
+      class S {
+        constructor(){this.reset()}
+        reset(){this.x=Math.random()*cv.width;this.y=Math.random()*cv.height;this.sz=Math.random()*25+10;this.rot=Math.random()*6.28;this.rs=(Math.random()-.5)*.012;this.sx=(Math.random()-.5)*.4;this.sy=(Math.random()-.5)*.4;this.a=Math.random()*.05+.01;this.t=Math.floor(Math.random()*4);this.h=hb+Math.random()*80;}
+        update(){this.x+=this.sx;this.y+=this.sy;this.rot+=this.rs;if(mouse.x!==null){const dx=this.x-mouse.x,dy=this.y-mouse.y,d=Math.sqrt(dx*dx+dy*dy);if(d<150){this.x+=dx*.005;this.y+=dy*.005;}}if(this.x<-60||this.x>cv.width+60)this.sx*=-1;if(this.y<-60||this.y>cv.height+60)this.sy*=-1;}
+        draw(){cx.save();cx.translate(this.x,this.y);cx.rotate(this.rot);cx.strokeStyle=`hsla(${this.h},70%,50%,${this.a})`;cx.lineWidth=1;if(this.t===0){cx.beginPath();cx.arc(0,0,this.sz,0,6.28);cx.stroke();}else if(this.t===1){cx.strokeRect(-this.sz/2,-this.sz/2,this.sz,this.sz);}else if(this.t===2){cx.beginPath();cx.moveTo(0,-this.sz);cx.lineTo(this.sz*.866,this.sz*.5);cx.lineTo(-this.sz*.866,this.sz*.5);cx.closePath();cx.stroke();}else{cx.beginPath();cx.moveTo(0,-this.sz);cx.lineTo(this.sz*.6,0);cx.lineTo(0,this.sz);cx.lineTo(-this.sz*.6,0);cx.closePath();cx.stroke();}cx.restore();}
+      }
+
+      for(let i=0;i<220;i++)ps.push(new P());
+      for(let i=0;i<18;i++)shapes.push(new S());
+      for(let i=0;i<80;i++)stars.push({x:Math.random()*cv.width,y:Math.random()*cv.height,sz:Math.random()*1.2+.3,tw:Math.random()*6.28,sp:Math.random()*.03+.01});
+
+      let shooters = [];
+      setInterval(()=>{if(shooters.length<4)shooters.push({x:Math.random()*cv.width,y:Math.random()*cv.height*.5,len:Math.random()*80+40,sp:Math.random()*10+8,ang:Math.PI/4+(Math.random()-.5)*.3,a:1,dec:Math.random()*.015+.008,h:hb+Math.random()*40,active:true});},1800);
+
+      function animate(t){
+        cx.fillStyle='rgba(10,14,23,0.18)';cx.fillRect(0,0,cv.width,cv.height);
+        [{x:cv.width*.2+Math.sin(t*.0003)*120,y:cv.height*.3+Math.cos(t*.0004)*90,r:280,c:'0,212,255'},{x:cv.width*.8+Math.cos(t*.0005)*140,y:cv.height*.7+Math.sin(t*.0003)*110,r:300,c:'123,47,247'},{x:cv.width*.5+Math.sin(t*.0004)*100,y:cv.height*.5+Math.cos(t*.0006)*70,r:220,c:'0,255,136'},{x:cv.width*.15+Math.cos(t*.0006)*80,y:cv.height*.8+Math.sin(t*.0005)*60,r:180,c:'255,100,50'}].forEach(o=>{const g=cx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);g.addColorStop(0,`rgba(${o.c},0.035)`);g.addColorStop(1,`rgba(${o.c},0)`);cx.fillStyle=g;cx.fillRect(o.x-o.r,o.y-o.r,o.r*2,o.r*2);});
+        stars.forEach(s=>{s.tw+=s.sp;const a=0.2+Math.sin(s.tw)*.2;cx.beginPath();cx.arc(s.x,s.y,s.sz,0,6.28);cx.fillStyle=`hsla(${hb+20},60%,80%,${Math.max(0,a)})`;cx.fill();});
+        shapes.forEach(s=>{s.update();s.draw();});
+        ps.forEach(p=>{p.update();p.draw();});
+        for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const dx=ps[i].x-ps[j].x,dy=ps[i].y-ps[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){cx.beginPath();cx.moveTo(ps[i].x,ps[i].y);cx.lineTo(ps[j].x,ps[j].y);cx.strokeStyle=`hsla(${hb},70%,55%,${(1-d/100)*.1})`;cx.lineWidth=.5;cx.stroke();}}
+        if(mouse.x!==null)ps.forEach(p=>{const dx=mouse.x-p.x,dy=mouse.y-p.y,d=Math.sqrt(dx*dx+dy*dy);if(d<200){const g=cx.createLinearGradient(p.x,p.y,mouse.x,mouse.y);g.addColorStop(0,`hsla(${hb},80%,60%,0)`);g.addColorStop(1,`hsla(${hb+30},80%,65%,${(1-d/200)*.3})`);cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(mouse.x,mouse.y);cx.strokeStyle=g;cx.lineWidth=.7;cx.stroke();}});
+        shooters=shooters.filter(s=>s.a>0);shooters.forEach(s=>{s.x+=Math.cos(s.ang)*s.sp;s.y+=Math.sin(s.ang)*s.sp;s.a-=s.dec;const tx=s.x-Math.cos(s.ang)*s.len,ty=s.y-Math.sin(s.ang)*s.len;const g=cx.createLinearGradient(s.x,s.y,tx,ty);g.addColorStop(0,`hsla(${s.h},80%,75%,${s.a})`);g.addColorStop(1,`hsla(${s.h},80%,75%,0)`);cx.beginPath();cx.moveTo(s.x,s.y);cx.lineTo(tx,ty);cx.strokeStyle=g;cx.lineWidth=1.5;cx.stroke();});
+        ripples=ripples.filter(r=>r.a>0);ripples.forEach(r=>{r.r+=r.s;r.a-=.008;cx.beginPath();cx.arc(r.x,r.y,r.r,0,6.28);cx.strokeStyle=`hsla(${hb+40},80%,65%,${Math.max(0,r.a)})`;cx.lineWidth=1.5;cx.stroke();});
+        hb=(hb+.03)%360;requestAnimationFrame(animate);
+      }
+      animate(0);
+    })();
+
+    function openModal(type) {
+      closeModals();
+      document.getElementById(type + '-modal').classList.add('active');
+      const inp = type === 'visitor' ? document.getElementById('v-name') : document.getElementById('a-name');
+      setTimeout(() => inp.focus(), 100);
+    }
+    function closeModals() {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+      document.querySelectorAll('.error').forEach(e => e.style.display = 'none');
+    }
+    async function goVisitor() {
+      const name = document.getElementById('v-name').value.trim();
+      if (!name) { document.getElementById('v-err').style.display = 'block'; return; }
+      try {
+        const res = await fetch('/api/auth/visitor', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({name}) });
+        const text = await res.text();
+        let data = null; try { data = JSON.parse(text); } catch (e) {}
+        if (!data || !data.token) { alert('Server error (HTTP ' + res.status + '): ' + ((data && (data.message || data.error)) || text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 200))); return; }
+        window.location.href = '/portfolio.html?token=' + data.token + '&name=' + encodeURIComponent(name);
+      } catch(e) { alert('Network error: ' + e.message); }
+    }
+    async function goAdmin() {
+      const name = document.getElementById('a-name').value.trim();
+      const email = document.getElementById('a-email').value.trim();
+      const pass = document.getElementById('a-pass').value;
+      if (!name || !email || !pass) { document.getElementById('a-err').style.display = 'block'; document.getElementById('a-err').textContent = 'All fields required'; return; }
+      try {
+        const res = await fetch('/api/auth/admin', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({name, email, password: pass}) });
+        const text = await res.text();
+        let data = null; try { data = JSON.parse(text); } catch (e) {}
+        if (!data) { alert('Server error (HTTP ' + res.status + '): ' + text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(0, 200)); return; }
+        if (data.error) { const el = document.getElementById('a-err'); el.style.display = 'block'; el.textContent = (data.message || data.error); return; }
+        sessionStorage.setItem('token', data.token);
+        window.location.href = '/editor.html?token=' + data.token;
+      } catch(e) { alert('Network error: ' + e.message); }
+    }
+  </script>
+</body>
+</html>
