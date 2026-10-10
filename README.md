@@ -164,7 +164,3 @@ Vercel serves everything in `public/` from its CDN and runs `server.js` (the Exp
 ## Author
 
 **Arham Bin Owais**
-
-## License
-
-_Add a license (for example MIT) or remove this section._
